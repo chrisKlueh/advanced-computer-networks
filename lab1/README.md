@@ -17,3 +17,10 @@ Die Firewall lässt grundsätzlich alles durch, was nicht durch einen Eintrag in
 Um die Kommunikation zwischen zwei Hosts in den beiden Subnetzen zu blockieren, muss eine entsprechende Regel in den beiden Switches hinterlegt werden.
 
 `firewall.addFirewallRule(ofp_datapath,{'src':'10.0.0.2','dst':'10.0.1.2'})`
+
+### Quellen
+1. Router: https://whurst.net/wp-content/uploads/SDN-Mininet-Topologie.pdf
+2. OpenFlow: Unterrichtsmaterial OpenFlowTopo.py
+3. OpenFlow: Unterrichtsmaterial OpenFlowApp.py
+4. OpenFlow: Unterrichtsmaterial OpenFlowAppLazySolution.py
+5. OpenFlow: Unterrichtsmaterial OpenFlowTopoH3.py
