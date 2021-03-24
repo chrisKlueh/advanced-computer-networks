@@ -8,23 +8,23 @@ import threading
 class Firewall():
 
 
-	def __init__(self):
-		pass
+  def __init__(self):
+    pass
 
-	def addFirewallRule(self,sw,rules):
+  def addFirewallRule(self,sw,rules):
 
-		ofp_protocol = sw.ofproto
-		ofp_parser = sw.ofproto_parser
+    ofp_protocol = sw.ofproto
+    ofp_parser = sw.ofproto_parser
 
-		flow_match = ofp_parser.OFPMatch(dl_type=0x0800, nw_src=rules['src'], nw_dst=rules['dst'])
+    flow_match = ofp_parser.OFPMatch(dl_type=0x0800, nw_src=rules['src'], nw_dst=rules['dst'])
 
-		flow_mod = ofp_parser.OFPFlowMod(datapath=sw,
-		                              match=flow_match,
-		                              command=ofp_protocol.OFPFC_ADD,		
-					      )
-	    
-		sw.send_msg(flow_mod)
-			
+    flow_mod = ofp_parser.OFPFlowMod(datapath=sw,
+                                  match=flow_match,
+                                  command=ofp_protocol.OFPFC_ADD,   
+                )
+      
+    sw.send_msg(flow_mod)
+      
 
 class OpenFlowApp(app_manager.RyuApp):
   
@@ -54,14 +54,15 @@ class OpenFlowApp(app_manager.RyuApp):
 
     #Firewall
     firewall = Firewall()
-
+    
+    #Firewall flows sw1
     self.logger.info("add firewall rule: [dp=%s]", dpid_lib.dpid_to_str(ofp_datapath.id))
     firewall.addFirewallRule(ofp_datapath,{'src':'10.0.0.2','dst':'10.0.1.2'})
-    #firewall.addFirewallRule(ofp_datapath,{'src':'10.0.0.3','dst':'10.0.0.2'})
-
+   
+    #Firewall flows sw2
     self.logger.info("add firewall rule: [dp=%s]", dpid_lib.dpid_to_str(ofp_datapath2.id))
     firewall.addFirewallRule(ofp_datapath2,{'src':'10.0.1.2','dst':'10.0.0.2'})
-    #firewall.addFirewallRule(ofp_datapath2,{'src':'10.0.0.2','dst':'10.0.0.3'})
+
 
     #SUBNETZ 1
 
@@ -146,5 +147,5 @@ class OpenFlowApp(app_manager.RyuApp):
   
 
 
-	
+  
     

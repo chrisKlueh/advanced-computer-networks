@@ -5,19 +5,19 @@ from mininet.cli import CLI
 from mininet.link import TCIntf
 from mininet.node import RemoteController
 
-class classRouter (Node):
+class Router(Node):
     def config (self, **params):
-        super (classRouter, self).config (**params)
+        super(Router, self).config (**params)
 
-    # Routing einschalten nachdem der Host hochgefahren ist
-        self.cmd ('sysctl net.ipv4.ip_forward=1')
+    # Routing einschalten 
+        self.cmd('sysctl net.ipv4.ip_forward=1')
 
     def terminate (self):
 
-    # Routing wieder abschalten bevor der Host runterfaehrt
-        self.cmd ('sysctl net.ipv4.ip_forward=0')
+    # Routing abschalten
+        self.cmd('sysctl net.ipv4.ip_forward=0')
 
-        super (classRouter, self).terminate()
+        super(Router, self).terminate()
 
 class CustomTopo(Topo):
 
@@ -28,12 +28,15 @@ class CustomTopo(Topo):
 
   def build(self):
 
+    # Switches 
     sw1 = self.addSwitch('sw1', defaultRoute='via 10.0.0.1', dpid='0000000000000001')
 
-    sw2 = self.addSwitch('sw2', defaultRoute='via 10.0.1.1',dpid='0000000000000002')
+    sw2 = self.addSwitch('sw2', defaultRoute='via 10.0.1.1', dpid='0000000000000002')
+    
+    # Router
+    router = self.addHost('router', ip='10.0.0.1/24', cls=Router)
 
-    router = self.addHost('router', ip='10.0.0.1/24', cls=classRouter)
-
+    # Hosts
     h1 = self.addHost('h1', ip='10.0.0.2/24', defaultRoute='via 10.0.0.1', mac='ba:de:af:fe:00:02')
     
     h2 = self.addHost('h2', ip='10.0.0.3/24', defaultRoute='via 10.0.0.1', mac='ba:de:af:fe:00:03')
@@ -42,15 +45,16 @@ class CustomTopo(Topo):
     
     h4 = self.addHost('h4', ip='10.0.1.3/24', defaultRoute='via 10.0.1.1', mac='ba:de:af:fe:00:05')
 
+    #Switches mit Hosts verbinden
     self.addLink(sw1, h1, 1, 1)
     self.addLink(sw1, h2, 2, 1)
     self.addLink(sw2, h3, 1, 1)
     self.addLink(sw2, h4, 2, 1)
 
-    #Connect Router with Switches
+    #Router mit Switches verbinden
     self.addLink (router, sw1, 1, 3, intfName1='router-eth1', params1={'ip':'10.0.0.1/24'})
     self.addLink (router, sw2, 2, 3, intfName1='router-eth2', params1={'ip':'10.0.1.1/24'})
-	
+  
 
 def run():
   topo = CustomTopo()
