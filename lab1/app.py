@@ -3,28 +3,68 @@ from ryu.ofproto import ofproto_v1_0
 from ryu.lib import dpid as dpid_lib
 from ryu.controller import dpset
 import threading
+import json
 
 
 class Firewall():
 
 
-  def __init__(self):
-    pass
+	def __init__(self):
+	
+		self.ProtocolTypes = {'IP':"IP",'UDP':"UDP",'TCP':"TCP"}
 
-  def addFirewallRule(self,sw,rules):
+	def addFirewallRule(self,sw,rules,type,ports = None):
 
-    ofp_protocol = sw.ofproto
-    ofp_parser = sw.ofproto_parser
+		ofp_protocol = sw.ofproto
+		ofp_parser = sw.ofproto_parser
 
-    flow_match = ofp_parser.OFPMatch(dl_type=0x0800, nw_src=rules['src'], nw_dst=rules['dst'])
+		
+		if type == self.ProtocolTypes['IP']:
+		
+			flow_match = ofp_parser.OFPMatch(dl_type=0x0800, nw_src=rules['src'], nw_dst=rules['dst'])
 
-    flow_mod = ofp_parser.OFPFlowMod(datapath=sw,
-                                  match=flow_match,
-                                  command=ofp_protocol.OFPFC_ADD,   
-                )
-      
-    sw.send_msg(flow_mod)
-      
+			flow_mod = ofp_parser.OFPFlowMod(datapath=sw,
+				                      match=flow_match,
+				                      command=ofp_protocol.OFPFC_ADD		
+						      )
+			sw.send_msg(flow_mod)
+			
+		else:	
+			NetworkProtocol = None
+			DefaultPort = None
+
+			if type == self.ProtocolTypes['TCP']:
+				NetworkProtocol = 6
+				DefaultPort = 22
+			elif type ==  self.ProtocolTypes['UDP']:
+				NetworkProtocol = 17
+				DefaultPort = 5002
+
+			if ports is not None and len(ports) > 0:
+				for i in range(0,len(ports)):
+					flow_match = ofp_parser.OFPMatch(dl_type=0x0800,
+									nw_src=rules['src'],
+									nw_dst=rules['dst'],
+									nw_proto = NetworkProtocol,
+									tp_dst = ports[i])
+
+					flow_mod = ofp_parser.OFPFlowMod(datapath=sw,match=flow_match,command=ofp_protocol.OFPFC_ADD)
+					sw.send_msg(flow_mod)
+					
+			else:
+
+				flow_match = ofp_parser.OFPMatch(dl_type=0x0800,
+								nw_src=rules['src'],
+								nw_dst=rules['dst'],
+								nw_proto = NetworkProtocol,
+								tp_dst = DefaultPort)
+
+				flow_mod = ofp_parser.OFPFlowMod(datapath=sw,match=flow_match,command=ofp_protocol.OFPFC_ADD)
+				sw.send_msg(flow_mod)
+					
+
+					
+
 
 class OpenFlowApp(app_manager.RyuApp):
   
@@ -52,16 +92,23 @@ class OpenFlowApp(app_manager.RyuApp):
     ofp_datapath = self._dpset.get(dpid_lib.str_to_dpid(self.datapaths['path1'])) 
     ofp_datapath2 = self._dpset.get(dpid_lib.str_to_dpid(self.datapaths['path2'])) 
 
+
     #Firewall
     firewall = Firewall()
-    
-    #Firewall flows sw1
-    self.logger.info("add firewall rule: [dp=%s]", dpid_lib.dpid_to_str(ofp_datapath.id))
-    firewall.addFirewallRule(ofp_datapath,{'src':'10.0.0.2','dst':'10.0.1.2'})
-   
-    #Firewall flows sw2
-    self.logger.info("add firewall rule: [dp=%s]", dpid_lib.dpid_to_str(ofp_datapath2.id))
-    firewall.addFirewallRule(ofp_datapath2,{'src':'10.0.1.2','dst':'10.0.0.2'})
+
+    rules = None
+    with open('firewallrules.json') as f:
+    	rules = json.load(f)
+
+    for rule in rules:
+        CurrentDatapath = None
+        if rule['datapath'] == 1:
+            CurrentDatapath = ofp_datapath 
+        elif rule['datapath'] == 2:
+            CurrentDatapath = ofp_datapath2
+		
+        self.logger.info("add firewall rules: [dp=%s]", dpid_lib.dpid_to_str(CurrentDatapath.id))
+        firewall.addFirewallRule(CurrentDatapath,{'src':rule['src_ip'],'dst':rule['dst_ip']},rule['proto'],rule['ports'])
 
 
     #SUBNETZ 1
@@ -147,5 +194,5 @@ class OpenFlowApp(app_manager.RyuApp):
   
 
 
-  
+	
     
