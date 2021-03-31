@@ -14,9 +14,50 @@ Die Switches implementieren die Funktion der Firewall und das Forwarding in den 
 
 ### Firewall
 Die Firewall lässt grundsätzlich alles durch, was nicht durch einen Eintrag in der Flow-Tabelle blockiert wird.
-Um die Kommunikation zwischen zwei Hosts in den beiden Subnetzen zu blockieren, muss eine entsprechende Regel in den beiden Switches hinterlegt werden.
+Alle Firewall-Regeln werden in firewallrules.json definiert und automatisch eingelesen.
 
-`firewall.addFirewallRule(ofp_datapath,{'src':'10.0.0.2','dst':'10.0.1.2'})`
+Jede Regel ist ein Objekt mit den Properties `"proto", "datapath", "ports", "src_ip"` und `"dst_ip"`. Alle Properties müssen immer angegeben werden.
+
+- "proto": zu blockierendes Protokoll (zulässige Parameter: "IP", "TCP", "UDP")
+- "datapath": Switch, auf dem die Regel festgelegt wird (zulässige Parameter: 1 (= Switch in 10.0.0.0/24), 2 (= Switch in 10.0.1.0/24))
+- "ports": Array mit den zu blockierenden Ports (leeres Array für das gesamte Protokoll)
+- "src_ip": Quell-IP-Adresse (als String)
+- "dst_ip": Ziel-IP-Adresse (als String)
+
+#### Beispiel
+`
+[
+  {
+    "proto": "IP",
+    "datapath": 1,
+    "ports": [],
+    "src_ip": "10.0.0.2",
+    "dst_ip": "10.0.1.2"
+  },
+  {
+    "proto": "TCP",
+    "datapath": 2,
+    "ports": [
+      5566,
+      5567
+    ],
+    "src_ip": "10.0.1.3",
+    "dst_ip": "10.0.0.3"
+  },
+  {
+    "proto": "UDP",
+    "datapath": 2,
+    "ports": [
+      5000,
+      5001,
+      5002
+    ],
+    "src_ip": "10.0.1.3",
+    "dst_ip": "10.0.0.3"
+  }
+]
+`
+
 
 ### Quellen
 1. Router: https://whurst.net/wp-content/uploads/SDN-Mininet-Topologie.pdf
