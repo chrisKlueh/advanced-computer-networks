@@ -2,8 +2,8 @@
 ## Programming Assignments
 ### Gruppe 08
 
-Dieses Repo enthält unsere Lösungen für Programming Assignment 1 und 2.
-Mehr Details finden sich in den jeweiligen README-Dateien in den Unterordnern.
+Dieses Repo enthält unsere Lösungen für Programming Assignment 1.
+Mehr Details finden sich in der README-Datei des Unterordners.
 
 Gruppenmitglieder:
 - Gabriel Dickert
