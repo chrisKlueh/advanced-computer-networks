@@ -2,7 +2,7 @@
 ## Programming Assignments
 ### Gruppe 08
 
-Dieses Repo enthält unsere Lösungen für Programming Assignment 1.
+Dieses Repo enthält unsere Lösung für Programming Assignment 1.
 Mehr Details finden sich in der README-Datei des Unterordners.
 
 Gruppenmitglieder:
