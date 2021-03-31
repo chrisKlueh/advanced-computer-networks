@@ -18,14 +18,14 @@ Alle Firewall-Regeln werden in firewallrules.json definiert und automatisch eing
 
 Jede Regel ist ein Objekt mit den Properties `"proto", "datapath", "ports", "src_ip"` und `"dst_ip"`. Alle Properties müssen immer angegeben werden.
 
-- "proto": zu blockierendes Protokoll (zulässige Parameter: "IP", "TCP", "UDP")
-- "datapath": Switch, auf dem die Regel festgelegt wird (zulässige Parameter: 1 (= Switch in 10.0.0.0/24), 2 (= Switch in 10.0.1.0/24))
+- "proto": zu blockierendes Protokoll (zulässige Parameter: `"IP", "TCP", "UDP"`)
+- "datapath": Switch, auf dem die Regel festgelegt wird (zulässige Parameter: `1` (= Switch in 10.0.0.0/24), `2` (= Switch in 10.0.1.0/24))
 - "ports": Array mit den zu blockierenden Ports (leeres Array für das gesamte Protokoll)
 - "src_ip": Quell-IP-Adresse (als String)
 - "dst_ip": Ziel-IP-Adresse (als String)
 
 #### Beispiel
-`
+```yaml
 [
   {
     "proto": "IP",
@@ -56,7 +56,7 @@ Jede Regel ist ein Objekt mit den Properties `"proto", "datapath", "ports", "src
     "dst_ip": "10.0.0.3"
   }
 ]
-`
+```
 
 
 ### Quellen
