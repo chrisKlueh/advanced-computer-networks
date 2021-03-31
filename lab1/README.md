@@ -27,7 +27,7 @@ Jede Regel ist ein Objekt mit den Properties `"proto", "datapath", "ports", "src
 Hinweis: jeder Eintrag steht für eine Richtung, d.h. für Blockade einer Response muss ein eigener Eintrag auf dem anderen Switch angelegt werden.
 
 #### Beispiel
-```json
+```yaml
 [
   {
     "proto": "IP",
